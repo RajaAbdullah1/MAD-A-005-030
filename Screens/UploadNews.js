@@ -1,18 +1,55 @@
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, FlatList, ImageBackground, ToastAndroid, ScrollView } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  ImageBackground,
+  ToastAndroid,
+  ScrollView,
+} from 'react-native';
 import {useState} from 'react';
 import NavigationBar from './NavigationBar';
+import firestore from '@react-native-firebase/firestore';
 
-export default function App() {
+export default function App({navigation}) {
+  // const toastMSG = () => {
+  //   ToastAndroid.show('Account Registered', ToastAndroid.SHORT);
+  // };
 
-  const toastMSG = () => {
-    ToastAndroid.show("Account Registered", ToastAndroid.SHORT)
+  const newsCollection = firestore().collection('News');
+
+  const [category, setCategory] = useState('');
+  const [title, setTitle] = useState('');
+  const [desc, setDesc] = useState('');
+  const [comments, setComments] = useState('');
+
+  const handleNewsUpload = async ()=>{
+    var daty=new Date();
+    var todayDate=daty.getMonth()+'-'+daty.getDate()+'-'+daty.getFullYear();
+    await newsCollection.add({
+      category: category,
+      title: title,
+      desc: desc,
+      comments: comments,
+      dateCreated: todayDate
+    })
+    .then(() => {
+      alert ("News Uploaded successfully")
+      setCategory("");
+      setTitle("")
+      setDesc("");
+      setComments("");
+      navigation.navigate('Home')
+      
+    })
   }
+
 
   return (
     <View style={styles.loginMain}>
-
-    
-<ScrollView>
+      <ScrollView>
         <Text style={styles.title}>Create News</Text>
 
         {/* <View style={styles.image}>
@@ -20,41 +57,77 @@ export default function App() {
         </View> */}
 
         <View style={styles.inputView}>
-        <TextInput placeholder="Category" placeholderTextColor={'darkgreen'} style={[styles.inputField, {height: 55, borderRadius: 50}]}></TextInput>
-        <TextInput placeholder="Title" placeholderTextColor={'darkgreen'} style={[styles.inputField, {height: 55, borderRadius: 50}]}></TextInput>
-        <TextInput placeholder="Description" placeholderTextColor={'darkgreen'} style={[styles.inputField, {height: 140, borderRadius: 20}]}></TextInput>
-        <TextInput placeholder="Comments" placeholderTextColor={'darkgreen'} style={[styles.inputField, {height: 90, borderRadius: 20}]}></TextInput>
+          <TextInput
+            onChangeText={value => setCategory(value)}
+            placeholder="Category"
+            placeholderTextColor={'darkgreen'}
+            value = {category}
+            style={[
+              styles.inputField,
+              {height: 55, borderRadius: 50},
+            ]}></TextInput>
+          <TextInput
+            onChangeText={value => setTitle(value)}
+            placeholder="Title"
+            placeholderTextColor={'darkgreen'}
+            value = {title}
+            style={[
+              styles.inputField,
+              {height: 55, borderRadius: 50},
+            ]}></TextInput>
+          <TextInput
+            onChangeText={value => setDesc(value)}
+            placeholder="Description"
+            placeholderTextColor={'darkgreen'}
+            value = {desc}
+            style={[
+              styles.inputField,
+              {height: 140, borderRadius: 20},
+            ]}></TextInput>
+          <TextInput
+            onChangeText={value => setComments(value)}
+            placeholder="Comments"
+            placeholderTextColor={'darkgreen'}
+            value = {comments}
+            style={[
+              styles.inputField,
+              {height: 90, borderRadius: 20},
+            ]}></TextInput>
         </View>
-        
 
         <View style={styles.buttonView}>
-        <TouchableOpacity style={styles.uploadBTN}>
-            <Text style={{color: '#4CBB17', textAlign: 'center', fontWeight: 'bold'}}>Upload Image</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.buttons, {marginBottom: 70,}]}>
-            <Text style={{color: 'white', textAlign: 'center', fontWeight: 'bold'}}>Submit</Text>
-        </TouchableOpacity>
-       
+          {/* <TouchableOpacity style={styles.uploadBTN}>
+            <Text
+              style={{
+                color: '#4CBB17',
+                textAlign: 'center',
+                fontWeight: 'bold',
+              }}>
+              Upload Image
+            </Text>
+          </TouchableOpacity> */}
+          <TouchableOpacity
+            
+            style={[styles.buttons, {marginBottom: 70}]}
+            onPress={handleNewsUpload}>
+            <Text
+              style={{color: 'white', textAlign: 'center', fontWeight: 'bold'}}>
+              Submit
+            </Text>
+          </TouchableOpacity>
         </View>
+      </ScrollView>
 
-    </ScrollView>
-
-
-        <NavigationBar  />
-
-
+      <NavigationBar />
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
-
   loginMain: {
     backgroundColor: 'white',
   },
 
-   
   title: {
     fontSize: 23,
     paddingLeft: 25,
@@ -63,9 +136,9 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 
-  inputView:{
-    marginTop:20,
-  },    
+  inputView: {
+    marginTop: 20,
+  },
 
   inputField: {
     borderWidth: 0,
@@ -73,7 +146,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     borderRadius: 50,
-    marginTop:10,
+    marginTop: 10,
     textAlign: 'center',
     borderColor: 'lightgreen',
     backgroundColor: '#E4FAE4',
@@ -81,11 +154,11 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 
-  buttonView:{
+  buttonView: {
     marginTop: 20,
   },
 
-  uploadBTN:{
+  uploadBTN: {
     backgroundColor: 'transparent',
     paddingTop: 19,
     paddingBottom: 19,
@@ -98,7 +171,6 @@ const styles = StyleSheet.create({
     color: 'black',
     borderWidth: 1,
     borderColor: '#4CBB17',
-
   },
 
   buttons: {
@@ -119,9 +191,9 @@ const styles = StyleSheet.create({
     width: 200,
   },
 
-  image:{
+  image: {
     height: 200,
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 5,
     marginTop: 25,
     marginLeft: 20,
@@ -131,5 +203,4 @@ const styles = StyleSheet.create({
     borderColor: '#4CBB17',
     borderWidth: 0.5,
   },
-
 });
